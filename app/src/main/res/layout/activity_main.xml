@@ -9,53 +9,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="android.niyaz.ru.sensor.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/xzValue"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="73dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Угол XZ"
-        android:id="@+id/textView5"
-        android:layout_marginRight="55dp"
-        android:layout_marginEnd="55dp"
-        android:layout_alignBaseline="@+id/xzValue"
-        android:layout_alignBottom="@+id/xzValue"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Right"
-        android:id="@+id/buttonRight"
-        android:layout_marginTop="158dp"
-        android:layout_below="@+id/textView5"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Left"
-        android:id="@+id/buttonLeft"
-        android:layout_alignTop="@+id/buttonRight"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Gas"
+        android:text="Газ"
         android:id="@+id/buttonGas"
-        android:layout_above="@+id/buttonLeft"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="35dp" />
+        android:layout_marginTop="132dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Тормоз"
+        android:id="@+id/buttonSlowdown"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/buttonGas"
+        android:layout_alignStart="@+id/buttonGas" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="75dp"
+        android:layout_alignLeft="@+id/buttonSlowdown"
+        android:layout_alignStart="@+id/buttonSlowdown"
+        android:layout_alignRight="@+id/buttonSlowdown"
+        android:layout_alignEnd="@+id/buttonSlowdown"
+        android:editable="true" />
+
 </RelativeLayout>

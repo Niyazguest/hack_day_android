@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedInputStream;
@@ -33,11 +34,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float[] OrientationData; //Матрица положения в пространстве
     private Integer speed = 0;
 
-    private TextView xzView;
+    private EditText ipText;
 
-    private Button buttonRight;
-    private Button buttonLeft;
     private Button buttonGas;
+    private Button buttonSlowdown;
 
     private Timer timer = new Timer();
 
@@ -55,27 +55,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         OrientationData = new float[3];
 
         setContentView(R.layout.activity_main);
-
-        xzView = (TextView) findViewById(R.id.xzValue);
-
-        buttonRight = (Button) findViewById(R.id.buttonRight);
-        buttonLeft = (Button) findViewById(R.id.buttonLeft);
+        ipText = (EditText) findViewById(R.id.editText);
         buttonGas = (Button) findViewById(R.id.buttonGas);
-
-        buttonRight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.this.OrientationData[1] = MainActivity.this.OrientationData[1] - 1;
-            }
-        });
-
-        buttonLeft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.this.OrientationData[1] = MainActivity.this.OrientationData[1] + 1;
-            }
-        });
-
         buttonGas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,41 +64,44 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        timer.schedule(new TimerTask() {
+        buttonSlowdown = (Button) findViewById(R.id.buttonSlowdown);
+        buttonSlowdown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                speed = speed - 5;
+            }
+        });
+
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    MainActivity.this.smartPhoneID = getSmartPhoneID();
-                    timer.scheduleAtFixedRate(new TimerTask() {
-                        @Override
-                        public void run() {
-                            try {
-                                URL url = new URL("http://192.168.43.118:8080/angles");
-                                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                                urlConnection.setRequestMethod("POST");
-                                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                                urlConnection.setRequestProperty("charset", "utf-8");
-                                urlConnection.setUseCaches(false);
-                                String postData = "";
-                                postData = "id=" + smartPhoneID.toString() +
-                                        "&xy=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[0]))) +
-                                        "&xz=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[1]))) +
-                                        "&zy=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[2]))) +
-                                        "&speed=" + Integer.toString(speed);
-                                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-                                wr.write(postData.getBytes("UTF-8"));
-                                urlConnection.getResponseCode();
-                                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                            } catch (Exception ex) {
-                                return;
-                            }
-                        }
-                    }, 1000, 500);
+                    String ip;
+                    if (ipText.getText().toString() != null && ipText.getText().toString() != "")
+                        ip = ipText.getText().toString();
+                    else
+                        ip = "192.168.22.191";
+                    URL url = new URL("http://" + ip + ":8080/angles");
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    urlConnection.setRequestProperty("charset", "utf-8");
+                    urlConnection.setUseCaches(false);
+                    String postData = "";
+                    postData = "xy=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[0]))) +
+                            "&xz=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[1]))) +
+                            "&zy=" + String.valueOf(Math.round(Math.toDegrees(OrientationData[2]))) +
+                            "&speed=" + Integer.toString(speed);
+                    DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                    wr.write(postData.getBytes("UTF-8"));
+                    urlConnection.getResponseCode();
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 } catch (Exception ex) {
-
+                    return;
                 }
             }
-        }, 3000);
+        }, 1000, 500);
+
 
     }
 
@@ -127,13 +111,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SensorManager.getRotationMatrix(rotationMatrix, null, accelData, magnetData); //Получаем матрицу поворота
         SensorManager.getOrientation(rotationMatrix, OrientationData); //Получаем данные ориентации устройства в пространстве
 
-        if (xzView == null) {  //Без этого работать отказалось.
-            xzView = (TextView) findViewById(R.id.xzValue);
-        }
-
-        //Выводим результат
-
-        xzView.setText(String.valueOf(Math.round(Math.toDegrees(OrientationData[1]))));
     }
 
     @Override
@@ -166,7 +143,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private Integer getSmartPhoneID() throws Exception {
-        URL url = new URL("http://192.168.43.118:8080/reg");
+        String ip;
+        if (ipText.getText().toString() != "")
+            ip = ipText.getText().toString();
+        else
+            ip = "192.168.22.191";
+        URL url = new URL("http://" + ip + ":8080/reg");
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.getResponseCode();
